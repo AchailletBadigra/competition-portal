@@ -10,8 +10,8 @@ import { supabase } from "@/lib/supabase";
 const schema = z.object({
   start_date: z.string().min(1, "Start date is required"),
   end_date: z.string().min(1, "End date is required"),
-  ticket_price: z.coerce.number().positive("Must be greater than 0"),
-  total_tickets: z.coerce.number().int().positive("Must be greater than 0"),
+  ticket_price: z.preprocess((v) => parseFloat(String(v)), z.number().positive("Must be greater than 0")),
+  total_tickets: z.preprocess((v) => parseInt(String(v)), z.number().int().positive("Must be greater than 0")),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -28,7 +28,7 @@ export default function EditCompetition({ params }: { params: { id: string } }) 
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) as any });
+  } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     async function load() {
