@@ -15,6 +15,7 @@ const schema = z.object({
   total_tickets: z.coerce.number().int().positive("Must be greater than 0"),
   start_date: z.string().min(1, "Start date is required"),
   end_date: z.string().min(1, "End date is required"),
+  upsells: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -58,10 +59,15 @@ export default function NewCompetition() {
         galleryUrls.push(url);
       }
 
+      const upsellIds = data.upsells
+        ? data.upsells.split(",").map((s) => s.trim()).filter(Boolean)
+        : [];
+
       const { error: insertError } = await supabase.from("competitions").insert({
         ...data,
         cover_image: coverUrl,
         gallery_images: galleryUrls,
+        upsells: upsellIds,
         status,
       });
 
@@ -131,6 +137,17 @@ export default function NewCompetition() {
             <input type="date" {...register("end_date")} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900" />
             {errors.end_date && <p className="text-red-500 text-xs mt-1">{errors.end_date.message}</p>}
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Upsells <span className="text-gray-400 font-normal">(related competition IDs, comma separated)</span>
+          </label>
+          <input
+            {...register("upsells")}
+            placeholder="e.g. id1, id2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+          />
         </div>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
