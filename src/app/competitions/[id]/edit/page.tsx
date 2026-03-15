@@ -28,7 +28,7 @@ export default function EditCompetition({ params }: { params: { id: string } }) 
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({ resolver: zodResolver(schema) as any });
 
   useEffect(() => {
     async function load() {
