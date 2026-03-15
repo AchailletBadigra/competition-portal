@@ -2,6 +2,9 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { PlusCircle } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
+
 export default async function Home() {
   const { data: competitions } = await supabase
     .from("competitions")
