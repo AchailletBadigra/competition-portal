@@ -30,7 +30,7 @@ export default function NewCompetition() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({ resolver: zodResolver(schema) as any });
 
   async function uploadImage(file: File, path: string) {
     const { data, error } = await supabase.storage

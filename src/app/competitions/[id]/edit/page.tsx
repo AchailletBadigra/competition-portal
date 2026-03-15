@@ -29,8 +29,7 @@ export default function EditCompetition({ params }: { params: { id: string } }) 
     reset,
     formState: { errors },
  } = useForm<FormData>({ resolver: zodResolver(schema) as any });
-
-
+ 
   useEffect(() => {
     async function load() {
       const { data } = await supabase
