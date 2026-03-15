@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Competition Portal
+
+An internal admin portal for managing raffle competitions, built as a technical assessment.
+
+## Tech Stack
+
+- **Next.js 14** — Frontend and backend in one codebase. Chosen because this is an internal admin tool that doesn't need a separate API service.
+- **Supabase** — PostgreSQL database, file storage, and auth in one platform. Avoids setting up multiple services separately.
+- **Tailwind CSS + shadcn/ui** — Fast, clean UI without designing from scratch.
+- **Resend** — Simple transactional email API for winner announcements.
+- **React Hook Form + Zod** — Form management and validation with one shared schema.
+- **xlsx** — Excel export for competition entries.
+
+## Features
+
+- Create competitions with cover image, gallery, ticket price, dates and descriptions
+- Save competitions as draft or publish live
+- Manage existing competitions — edit dates, price, ticket limit, delete
+- View all competition entries in a table, filterable by competition
+- Export entries to Excel spreadsheet
+- Look up winner details by ticket number
+- Send winner announcement email to all entrants
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
 
 ```bash
+git clone https://github.com/AchailletBadigra/competition-portal.git
+cd competition-portal
+
+2. Install dependencies
+
+npm install
+
+3. Set up environment variables
+
+cp .env.example .env.local
+Fill in your Supabase and Resend credentials in .env.local
+
+4. Set up the database
+Run the following SQL in your Supabase SQL Editor:
+
+
+create table competitions (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  short_description text,
+  full_description text,
+  cover_image text,
+  gallery_images text[],
+  ticket_price numeric not null,
+  total_tickets integer not null,
+  start_date date,
+  end_date date,
+  status text default 'draft',
+  upsells uuid[],
+  created_at timestamp default now()
+);
+
+create table entries (
+  id uuid default gen_random_uuid() primary key,
+  competition_id uuid references competitions(id) on delete cascade,
+  name text not null,
+  email text not null,
+  ticket_number integer not null,
+  purchased_at timestamp default now()
+);
+
+5. Run the development server
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Open http://localhost:3000
+
+What I would add with more time
+Authentication — Protect the portal with email/password login via Supabase Auth
+Stripe integration — Real ticket purchases tied automatically to entries
+Role-based access — Super admin, agent, and viewer roles
+Email queue — Use a job queue for reliable bulk email sending at scale
+Audit logs — Track who changed what and when, critical for money-related features
+Customer-facing side — Public competition pages where customers browse and buy tickets
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
