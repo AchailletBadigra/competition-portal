@@ -92,13 +92,34 @@ export default function EditCompetition({ params }: { params: Promise<{ id: stri
           <h1 className="text-2xl font-bold text-gray-900">Edit Competition</h1>
           <p className="text-gray-500 text-sm mt-1">{title}</p>
         </div>
+        <div className="flex gap-2">
         <button
-          onClick={handleDelete}
-          disabled={deleting}
-          className="text-sm px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
+            onClick={async () => {
+            await supabase.from("competitions").update({ status: "live" }).eq("id", id);
+            router.push("/");
+            }}
+            className="text-sm px-4 py-2 bg-green-50 text-green-600 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
         >
-          {deleting ? "Deleting..." : "Delete Competition"}
+            Publish Live
         </button>
+        <button
+            onClick={async () => {
+            await supabase.from("competitions").update({ status: "draft" }).eq("id", id);
+            router.push("/");
+            }}
+            className="text-sm px-4 py-2 bg-yellow-50 text-yellow-600 border border-yellow-200 rounded-lg hover:bg-yellow-100 transition-colors"
+        >
+            Set to Draft
+        </button>
+        <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="text-sm px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
+        >
+            {deleting ? "Deleting..." : "Delete"}
+        </button>
+        </div>
+
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-white border border-gray-200 rounded-xl p-8">
