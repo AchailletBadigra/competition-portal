@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +16,8 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function EditCompetition({ params }: { params: { id: string } }) {
+export default function EditCompetition({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -28,14 +29,14 @@ export default function EditCompetition({ params }: { params: { id: string } }) 
     handleSubmit,
     reset,
     formState: { errors },
- } = useForm<FormData>({ resolver: zodResolver(schema) as any });
- 
+  } = useForm<FormData>({ resolver: zodResolver(schema) as any });
+
   useEffect(() => {
     async function load() {
       const { data } = await supabase
         .from("competitions")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", id)
         .single();
 
       if (data) {
@@ -49,7 +50,7 @@ export default function EditCompetition({ params }: { params: { id: string } }) 
       }
     }
     load();
-  }, [params.id, reset]);
+  }, [id, reset]);
 
   async function onSubmit(data: FormData) {
     setLoading(true);
@@ -58,7 +59,7 @@ export default function EditCompetition({ params }: { params: { id: string } }) 
       const { error: updateError } = await supabase
         .from("competitions")
         .update(data)
-        .eq("id", params.id);
+        .eq("id", id);
       if (updateError) throw updateError;
       router.push("/");
     } catch (err: any) {
@@ -75,7 +76,7 @@ export default function EditCompetition({ params }: { params: { id: string } }) 
       const { error: deleteError } = await supabase
         .from("competitions")
         .delete()
-        .eq("id", params.id);
+        .eq("id", id);
       if (deleteError) throw deleteError;
       router.push("/");
     } catch (err: any) {
